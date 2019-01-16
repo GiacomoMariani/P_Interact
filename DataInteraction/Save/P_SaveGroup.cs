@@ -10,7 +10,7 @@ namespace JReact.Playfab_Interact.Data
     public class P_SaveGroupQueue : P_InteractionTasks<P_SaveTask>
     {
         //if we want these to be private or public
-        [BoxGroup("State", true, true, 5), ReadOnly, ShowInInspector] private bool _isPrivate = true;
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] private bool _isPrivate = true;
 
         #region INITIATION
         // this is used to initiate the save loop. It register all the containing elements, so they can talk to each other

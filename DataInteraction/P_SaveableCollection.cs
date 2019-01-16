@@ -19,12 +19,12 @@ namespace JReact.Playfab_Interact.Data
         #region FIELDS AND PROPERTIES
         // --------------- STATE --------------- //
         //the collection we want to save
-        [BoxGroup("State", true, true, 5), ReadOnly, ShowInInspector]
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector]
         protected abstract J_ReactiveCollection<T> _CollectionToSave { get; }
         //this dictionary is used to track the data
-        [BoxGroup("State", true, true, 5), ReadOnly, ShowInInspector] protected Dictionary<T, V> _tracker = new Dictionary<T, V>();
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] protected Dictionary<T, V> _tracker = new Dictionary<T, V>();
         //the data to be save
-        [BoxGroup("State", true, true, 5), ShowInInspector, ReadOnly]
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector]
         private P_CollectionDataToSave _dataToSave = new P_CollectionDataToSave();
         #endregion
 
@@ -35,8 +35,7 @@ namespace JReact.Playfab_Interact.Data
         //start tracking
         protected override void InitiateSaveCommandWith(P_SaveGroupQueue saveSystem)
         {
-            Assert.IsNotNull(_CollectionToSave,
-                             string.Format("This object ({0}) needs an element for the value _allDroneRequests", name));
+            Assert.IsNotNull(_CollectionToSave, $"{name} requires a _allDroneRequests");
             //first save
             TrackCollection(_CollectionToSave);
             //listen to all possible changes
@@ -58,8 +57,7 @@ namespace JReact.Playfab_Interact.Data
         {
             //sanity check
             Assert.IsFalse(_tracker.ContainsKey(elementAdded),
-                           string.Format("{0}{1} is trying to add the element {2} -of- {3}, but we're already tracking it.",
-                                         P_Constants.DEBUG_PlayfabInteract, name, elementAdded.ToString(), _CollectionToSave.name));
+                           $"{P_Constants.DEBUG_PlayfabInteract}{name} is trying to add the element {elementAdded.ToString()} -of- {_CollectionToSave.name}, but we're already tracking it.");
             StartTrackingElement(elementAdded);
             UpdateElementData(elementAdded);
         }
@@ -69,8 +67,7 @@ namespace JReact.Playfab_Interact.Data
         {
             //sanity check
             Assert.IsTrue(_tracker.ContainsKey(elementRemoved),
-                          string.Format("{0}{1} is trying to remove the element {2} -of- {3}, but it's not tracked yet.",
-                                        P_Constants.DEBUG_PlayfabInteract, name, elementRemoved.ToString(), _CollectionToSave.name));
+                          $"{P_Constants.DEBUG_PlayfabInteract}{name} is trying to remove the element {elementRemoved.ToString()} -of- {_CollectionToSave.name}, but it's not tracked yet.");
             StopTrackingElement(elementRemoved);
             _tracker.Remove(elementRemoved);
             RequestSaveSchedule();

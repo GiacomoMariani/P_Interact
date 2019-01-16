@@ -25,7 +25,7 @@
 //        { get { return ConnectionType.Facebook; } }
 //
 //        //here we store the current attempt
-//        [BoxGroup("State", true, true, 5), ReadOnly] private int _currentAttempt;
+//        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] private int _currentAttempt;
 //        protected override string _gameTitle {
 //            get { return ""; }
 //        }

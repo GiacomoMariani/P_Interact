@@ -79,8 +79,7 @@ namespace JReact.Playfab_Interact
         /// <param name="result">the result to be stored</param>
         internal void StoreLoginResult(LoginResult result, ConnectionType typeOfConnection)
         {
-            HelperConsole.DisplayMessage(string.Format("{0} set connection type as: {1}", name,
-                                                       typeOfConnection.ToString()));
+            PConsole.Log($"Set connection type as: {typeOfConnection.ToString()}", name, this);
             //save the session ticket
             SessionTicket = result.SessionTicket;
             //store the id
@@ -103,8 +102,7 @@ namespace JReact.Playfab_Interact
         private void ProfileSuccessCallback(GetPlayerProfileResult result)
         {
             //message feedback
-            P_PlayfabConsoleLogger.DisplayMessage(string.Format("Stored profile for: {0}",
-                                                                result.PlayerProfile.DisplayName), name);
+            PConsole.Log($"Stored profile for: {result.PlayerProfile.DisplayName}", name, this);
             //store the player profile and inject player name
             PlayerProfile = result.PlayerProfile;
             _playerName.InjectName(PlayerProfile.DisplayName);
@@ -129,15 +127,14 @@ namespace JReact.Playfab_Interact
         {
             //resetting the int to 0
             SetLoginType(Playfab_Interact.ConnectionType.NotSet);
-            HelperConsole.DisplayWarning(string.Format
-                                             ("Remember to remove also the data from playfab.\nPlayfab_PlayerId {0}.\nPlayfab_CustomPlayerId {1}",
-                                              Playfab_PlayerId, GeneratePlayerId()));
+            PConsole.Warning($"Remember to remove also the data from playfab.\nPlayfab_PlayerId {Playfab_PlayerId}.\nPlayfab_CustomPlayerId {GeneratePlayerId()}",
+                                name, this);
         }
         #endregion
 
         #region ERROR CALLBACK
         //the callback when the player profile cannot be retrieved
-        private void ProfileErrorCallback(PlayFabError error) { P_PlayfabConsoleLogger.LogErrorFrom(error, name); }
+        private void ProfileErrorCallback(PlayFabError error) { PConsole.ErrorFrom(error, name); }
         #endregion
 
         #region SUBSCRIBERS

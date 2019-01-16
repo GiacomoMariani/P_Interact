@@ -22,23 +22,23 @@ namespace JReact.Playfab_Interact.Data
 
         // --------------- SAVE --------------- //
         //all the group savers that have a reference to this element, we need this to schedule a save
-        [BoxGroup("State", true, true, 5), ReadOnly, ShowInInspector]
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector]
         private P_SaveGroupQueue _saveQueue;
         //save elements
-        [BoxGroup("State", true, true, 5), ReadOnly, ShowInInspector] private bool _saveRequested = false;
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] private bool _saveRequested = false;
         public bool SaveRequested { get { return _saveRequested; } private set { _saveRequested = value; } }
-        [BoxGroup("State", true, true, 5), ReadOnly, ShowInInspector] private bool _saveFailed = false;
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] private bool _saveFailed = false;
         public bool SaveFailed { get { return _saveFailed; } private set { _saveFailed = value; } }
 
         // --------------- LOAD --------------- //
         //load elements
-        [BoxGroup("State", true, true, 5), ReadOnly, ShowInInspector] private bool _loadRequested = false;
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] private bool _loadRequested = false;
         public bool LoadRequested { get { return _loadRequested; } private set { _loadRequested = value; } }
-        [BoxGroup("State", true, true, 5), ReadOnly, ShowInInspector] private bool _loadFailed = false;
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] private bool _loadFailed = false;
         public bool LoadFailed { get { return _loadFailed; } private set { _loadFailed = value; } }
 
         //a general bool to check if this item can be manipulated
-        [BoxGroup("State", true, true, 5), ReadOnly, ShowInInspector] public bool SaveableReady
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] public bool SaveableReady
         {
             get { return !SaveRequested && !LoadRequested; }
         }
@@ -53,7 +53,7 @@ namespace JReact.Playfab_Interact.Data
 
         //this method will implement a way to save this into a json
         public abstract string SaveThisIntoJson();
-        
+
         //the main method to handle the retrieved data
         protected abstract void LoadThisFromJson(string jsonData, DateTime dateTime);
         #endregion
@@ -64,7 +64,7 @@ namespace JReact.Playfab_Interact.Data
         {
             if (_saveQueue != null)
             {
-                P_PlayfabConsoleLogger.DisplayWarning(string.Format("Overriding {0} with {1}", _saveQueue.name, saveQueue.name), name);
+                PConsole.Warning($"Overriding {_saveQueue.name} with {saveQueue.name}", name, this);
             }
 
             _saveQueue = saveQueue;
@@ -89,7 +89,7 @@ namespace JReact.Playfab_Interact.Data
             SanityChecks();
 
             // --------------- CONFIRM THE SAVE --------------- //
-            P_PlayfabConsoleLogger.DisplayMessage(string.Format("Requested to schedule a save on {0}", _saveQueue.name), name);
+            PConsole.Log($"Requested to schedule a save on {_saveQueue.name}", name, this);
             _saveQueue.ScheduleThis(this);
         }
 
@@ -98,7 +98,7 @@ namespace JReact.Playfab_Interact.Data
             //STEP 1 - to avoid multiple save
             if (SaveRequested)
             {
-                P_PlayfabConsoleLogger.DisplayMessage(string.Format("Save canceled. This is saving already"), name);
+                PConsole.Log("Save canceled. This is saving already", name, this);
                 return false;
             }
 
@@ -106,18 +106,17 @@ namespace JReact.Playfab_Interact.Data
             //check all the conditions and return false if anyone of them is not met
             for (int i = 0; i < _saveConditions.Length; i++)
             {
-                Assert.IsNotNull(_saveConditions[i], string.Format("The save condition at index {0} of {1} is null", name, i));
+                Assert.IsNotNull(_saveConditions[i], $"The save condition at index {name} of {i} is null");
                 if (!_saveConditions[i].CurrentValue)
                 {
                     if (_debug)
-                        P_PlayfabConsoleLogger.DisplayMessage(string.Format("Save canceled. Condition not met: {0}",
-                                                                            _saveConditions[i].name), name);
+                        PConsole.Log($"Save canceled. Condition not met: {_saveConditions[i].name}", name, this);
                     return false;
                 }
 
                 //show the condition as confirmed
                 if (_debug)
-                    P_PlayfabConsoleLogger.DisplayMessage(string.Format("Confirmed condition: {0}", _saveConditions[i].name), name);
+                    PConsole.Log($"Confirmed condition: {_saveConditions[i].name}", name, this);
             }
 
             //confirm the conditions if all of them are met
@@ -126,17 +125,15 @@ namespace JReact.Playfab_Interact.Data
 
         private void SanityChecks()
         {
-            Assert.IsNotNull(_saveQueue, string.Format("{0} has no save queue", name));
-            Assert.IsFalse(LoadRequested, string.Format("This saveable is currently loading, we cannot save it: {0}", name));
+            Assert.IsNotNull(_saveQueue, $"{name} has no save queue");
+            Assert.IsFalse(LoadRequested, $"This saveable is currently loading, we cannot save it: {name}");
         }
 
         internal void SaveConfirmed(string itemSavedValue)
         {
             SaveRequested = false;
             SaveFailed    = false;
-            if (_debug)
-                HelperConsole.DisplayMessage(string.Format("{0} - {1} Saved data: {2}",
-                                                           P_Constants.DEBUG_PlayfabInteract, name, itemSavedValue));
+            if (_debug) PConsole.Log($"Saved data: {itemSavedValue}", name, this);
         }
 
         public virtual void SaveError()
@@ -175,8 +172,7 @@ namespace JReact.Playfab_Interact.Data
             LoadFailed    = false;
             //send a debug message if requested
             if (_debug)
-                P_PlayfabConsoleLogger.DisplayMessage(string.Format("Item has been loaded from {0}:\n{1}",
-                                                                    dateTime.ToString(CultureInfo.InvariantCulture), jsonData), name);
+                PConsole.Log($"Item has been loaded from {dateTime.ToString(CultureInfo.InvariantCulture)}:\n{jsonData}", name, this);
             LoadThisFromJson(jsonData, dateTime);
         }
         #endregion
@@ -187,7 +183,7 @@ namespace JReact.Playfab_Interact.Data
 
         public virtual void ResetThis()
         {
-            HelperConsole.DisplayMessage(string.Format("{0} is resetting", name), "-SAVEABLE- ");
+            PConsole.Log($"Reset start", name, this);
             //reset all data changer
             _saveQueue = null;
             //reset the saveable state
@@ -198,7 +194,7 @@ namespace JReact.Playfab_Interact.Data
         }
         #endregion
     }
-    
+
     [System.Serializable]
     public class SaveableData
     {

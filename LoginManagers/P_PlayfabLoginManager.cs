@@ -18,9 +18,9 @@ namespace JReact.Playfab_Interact.Login
 
         [BoxGroup("Setup", true, true, 0), ReadOnly] protected abstract string _gameTitle { get; }
         [BoxGroup("Setup", true, true, 0), SerializeField, AssetsOnly, Required] protected P_PlayfabPlayer _playerData;
-        [BoxGroup("State", true, true, 5), ReadOnly] protected abstract ConnectionType _connectionType { get; }
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] protected abstract ConnectionType _connectionType { get; }
 
-        [BoxGroup("State", true, true, 5), ReadOnly] private LoginResult _loginResult;
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] private LoginResult _loginResult;
         public LoginResult ThisLoginResult { get { return _loginResult; } private set { _loginResult = value; } }
 
         //connection elements, the max attemps for connection and the connection safe checks
@@ -48,7 +48,7 @@ namespace JReact.Playfab_Interact.Login
             //log in the game using the type of login we want
             if (_wantToDebug)
             {
-                HelperConsole.DisplayMessage(string.Format("{0} - Logging in", P_Constants.DEBUG_PlayfabInteract));
+                PConsole.Log($"Logging in", name, this);
                 yield return Timing.WaitForSeconds(_debugDelay);
             }
 
@@ -61,7 +61,7 @@ namespace JReact.Playfab_Interact.Login
         {
             if (!_connectionChecks.InternetReady)
             {
-                P_PlayfabConsoleLogger.DisplayWarning(P_Constants.ERROR_NoInternetConnection, name);
+                PConsole.Warning(P_Constants.ERROR_NoInternetConnection, name, this);
                 return true;
             }
 
@@ -72,8 +72,7 @@ namespace JReact.Playfab_Interact.Login
         {
             if (_connectionChecks.PlayerLoggedIntoPlayfab)
             {
-                P_PlayfabConsoleLogger.DisplayWarning
-                    ("We're trying to connect, to playfab, but we're already connected.\n This should never happen.", name);
+                PConsole.Warning("Already connected to playfab stop connection.\n This should never happen.", name, this);
                 return true;
             }
 
@@ -100,8 +99,8 @@ namespace JReact.Playfab_Interact.Login
             if (OnPlayfabLogin != null) OnPlayfabLogin(result);
             //store and authenticate player
             _playerData.StoreLoginResult(result, _connectionType);
-            P_PlayfabConsoleLogger.DisplayMessage(string.Format("Playfab Connect Succesfull. Player custom id: {0}. Player id: {1}"
-                                                                , _playerData.GeneratePlayerId(), result.PlayFabId), name);
+            PConsole.Log($"Playfab Connect Successful. Player custom id: {_playerData.GeneratePlayerId()}. Player id: {result.PlayFabId}",
+                         name, this);
             if (_wantToDebug) { yield return Timing.WaitForSeconds(_debugDelay); }
         }
         #endregion
@@ -110,8 +109,7 @@ namespace JReact.Playfab_Interact.Login
         //register one error and retry if we've not reached the max attempts
         protected virtual void PlayfabLogin_OnError(PlayFabError receivedError, int currentAttempt)
         {
-            P_PlayfabConsoleLogger.DisplayWarning(string.Format("Playfab Login Attempt {0} is failed. Error: {1}", currentAttempt,
-                                                                receivedError.ErrorMessage), name);
+            PConsole.Warning($"Playfab Login Attempt {currentAttempt} is failed. Error: {receivedError.ErrorMessage}", name, this);
             //adding one attempt and stop if we made all the attempts
             currentAttempt++;
             if (currentAttempt > _maxAttempts)
@@ -124,7 +122,7 @@ namespace JReact.Playfab_Interact.Login
         }
 
         //used to show the error
-        protected virtual void OnPlayFabError(PlayFabError error) { P_PlayfabConsoleLogger.LogErrorFrom(error, name); }
+        protected virtual void OnPlayFabError(PlayFabError error) { PConsole.ErrorFrom(error, name); }
         #endregion
 
         #region RESET

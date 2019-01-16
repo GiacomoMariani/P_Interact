@@ -11,9 +11,9 @@ namespace JReact.Playfab_Interact.Data
     public class P_LoadGroupQueue : P_InteractionTasks<P_LoadTask>
     {
         #region VALUES AND PROPERTIES
-        [BoxGroup("State", true, true, 5), ShowInInspector, ReadOnly] private string _playfabIdToLoad;
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] private string _playfabIdToLoad;
         //the keys we want to request
-        [BoxGroup("State", true, true, 5), ReadOnly, ShowInInspector] private List<string> _desiredKeys = new List<string>();
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] private List<string> _desiredKeys = new List<string>();
         #endregion
 
         #region INITIATION

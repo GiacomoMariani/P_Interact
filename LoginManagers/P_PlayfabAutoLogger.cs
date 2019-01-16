@@ -33,9 +33,9 @@ namespace JReact.Playfab_Interact.Login
         private void SanityChecks()
         {
             Assert.IsNotNull(_connectionChecker,
-                             string.Format("This object ({0}) needs an element for the value _playfabChecker", name));
+                             $"{name} requires a _playfabChecker");
             Assert.IsNotNull(_defaultLoginManager,
-                             string.Format("This object ({0}) needs an element for the value _playfabLogger", name));
+                             $"{name} requires a _playfabLogger");
         }
         #endregion
 
@@ -50,7 +50,7 @@ namespace JReact.Playfab_Interact.Login
             //send an error if we're not connected to internet
             if (!_connectionChecker.InternetReady)
             {
-                P_PlayfabConsoleLogger.DisplayWarning(P_Constants.ERROR_NoInternetConnection, name);
+                PConsole.Warning(P_Constants.ERROR_NoInternetConnection, name, this);
                 return;
             }
 
@@ -91,8 +91,8 @@ namespace JReact.Playfab_Interact.Login
         //stop if we have a time out
         private void TimeOut()
         {
-            P_PlayfabConsoleLogger
-                .DisplayWarning(string.Format("The connection check had a timeout. {0} second passed.", _secondsBeforeTimeout), name);
+            PConsole
+                .Warning($"The connection check had a timeout. {_secondsBeforeTimeout} second passed.", name, this);
         }
 
         //used to confirm the log

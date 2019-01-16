@@ -43,13 +43,13 @@ namespace JReact.Playfab_Interact.Data
             {
                 if (_tasks == null) return null;
                 Assert.IsTrue(NextTask < _tasks.Length,
-                              string.Format("{0} requested task {1}. But there are only  task {2}", name, NextTask, _tasks.Length));
+                              $"{name} requested task {NextTask}. But there are only  task {_tasks.Length}");
                 return _tasks[NextTask];
             }
         }
         //current task
         [BoxGroup("State", true, true, 5), ShowInInspector, ReadOnly] private int _nextTask = 0;
-        public int NextTask { get { return _nextTask; } protected set { _nextTask = value % _allocatedTask; } }
+        public int NextTask { get => _nextTask; protected set => _nextTask = value % _allocatedTask; }
         #endregion
 
         #region ABSTRACT IMPLEMENTATION
@@ -64,9 +64,7 @@ namespace JReact.Playfab_Interact.Data
         public void InitiateTasks()
         {
             if (_initialized) return;
-            HelperConsole
-                .DisplayMessage(string.Format("{0} (Save Group) Initiating with {1} elements.", name, _groupOfElements.Length),
-                                P_Constants.DEBUG_PlayfabInteractImportant);
+            PConsole.Log($"Initiating with {_groupOfElements.Length} elements.", name, this);
             //make sure this is ready to go
             SanityChecks();
             //register all elements
@@ -95,14 +93,12 @@ namespace JReact.Playfab_Interact.Data
         private void SanityChecks()
         {
             //make sure we have at least one element
-            Assert.IsTrue(_groupOfElements.Length > 0, string.Format("{0} The save queue requires at least one element.", name));
-            Assert.IsNotNull(_playfabInteractionQueue, string.Format("({0}) requires a _playfabInteractionQueue", name));
+            Assert.IsTrue(_groupOfElements.Length > 0, $"{name} The save queue requires at least one element.");
+            Assert.IsNotNull(_playfabInteractionQueue, $"({name}) requires a _playfabInteractionQueue");
 
             //make sure the queue is not more than possible
             Assert.IsTrue(_maxElementsToSend <= P_Constants.MaxRequestAmount,
-                          string.Format("{0}{1} queue has {2} as max queue to be saved, while the max amount is {3}",
-                                        P_Constants.DEBUG_PlayfabInteract, name, _maxElementsToSend,
-                                        P_Constants.MaxRequestAmount));
+                          $"{P_Constants.DEBUG_PlayfabInteract}{name} queue has {_maxElementsToSend} as max queue to be saved, while the max amount is {P_Constants.MaxRequestAmount}");
         }
         #endregion
 
@@ -120,8 +116,7 @@ namespace JReact.Playfab_Interact.Data
             //ignore if this is saving already
             if (IsThisScheduled(saveable))
             {
-                P_PlayfabConsoleLogger.DisplayMessage(string.Format("Interaction canceled. This is already in queue {0}",
-                                                                    saveable.name), name);
+                PConsole.Log($"Interaction canceled. This is already in queue {saveable.name}", name, this);
                 return;
             }
 
@@ -156,10 +151,9 @@ namespace JReact.Playfab_Interact.Data
         /// <param name="elementsToSave">the elements to be processed</param>
         public void ProcessTrunk(P_Saveable[] elementsToSave)
         {
-            Assert.IsNotNull(elementsToSave, string.Format("({0}) needs an element for elementsToSave", name));
-            Assert.IsTrue(elementsToSave.Length > 0, string.Format("({0}) requires at least one element to save", name));
-            HelperConsole.DisplayMessage(string.Format("{0} Schedule save force for {1} elements.", name, elementsToSave.Length),
-                                         P_Constants.DEBUG_PlayfabInteractImportant);
+            Assert.IsNotNull(elementsToSave, $"({name}) needs an element for elementsToSave");
+            Assert.IsTrue(elementsToSave.Length > 0, $"({name}) requires at least one element to save");
+            PConsole.Log($"Schedule save force for {elementsToSave.Length} elements.", name, this);
 
             //enqueue all elements, then process them
             for (int i = 0; i < elementsToSave.Length; i++)
@@ -178,20 +172,18 @@ namespace JReact.Playfab_Interact.Data
             if (_saveableInQueue.Count == 0) return;
             //initialize if required
             if (!_initialized) InitiateTasks();
-            P_PlayfabConsoleLogger.DisplayMessage(string.Format
-                                                      ("Sending a task. Queue remaining data {0}", _saveableInQueue.Count), name);
+            PConsole.Log($"Sending a task. Queue remaining data {_saveableInQueue.Count}", name, this);
 
             //we request to save this enough time to save the current saveables
             int totalTaskRequired = (_saveableInQueue.Count / _maxElementsToSend) + 1;
             for (int i = 0; i < totalTaskRequired; i++)
             {
                 //make sure the task is not running
-                Assert.IsFalse(_CurrentTask.IsRunning,
-                               string.Format("{0} is trying to access {1}, that is running already", name, _CurrentTask.TaskName));
+                Assert.IsFalse(_CurrentTask.IsRunning, $"{name} is trying to access {_CurrentTask.TaskName}, that is running already");
 
                 //MAIN - setup the task and process it
                 SetupCurrentTask(_maxElementsToSend);
-                P_PlayfabConsoleLogger.DisplayMessage(string.Format("Setup the task {0}", _CurrentTask.TaskName), name);
+                PConsole.Log($"Setup the task {_CurrentTask.TaskName}", name, this);
                 _playfabInteractionQueue.ProcessTask(_CurrentTask);
                 //update the task
                 NextTask++;

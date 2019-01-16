@@ -56,7 +56,7 @@ namespace JReact.Playfab_Interact
         {
             if (CurrentlyLoading)
             {
-                P_PlayfabConsoleLogger.DisplayWarning("We should never ask the time if we're already retrieving it. Message from {0}", name);
+                PConsole.Warning("We should never ask the time if we're already retrieving it. Message from {0}", name, this);
                 return true;
             }
 
@@ -65,7 +65,7 @@ namespace JReact.Playfab_Interact
 
         private void GetTime_OnSuccess(GetTimeResult timeRetrieved)
         {
-            if (_debugMode) P_PlayfabConsoleLogger.DisplayMessage(string.Format("Time Retrieved: {0}", timeRetrieved.Time), name);
+            if (_debugMode) PConsole.Log($"Time Retrieved: {timeRetrieved.Time}", name, this);
             //stop loading and confirm the time retrieved
             CurrentlyLoading = false;
             TimeRetrieved = true;
@@ -79,7 +79,7 @@ namespace JReact.Playfab_Interact
             //stop loading
             CurrentlyLoading = false;
             //send the error
-            P_PlayfabConsoleLogger.LogErrorFrom(error, name);
+            PConsole.ErrorFrom(error, name, this);
         }
 
         #region SUBSCRIBE EVENTS

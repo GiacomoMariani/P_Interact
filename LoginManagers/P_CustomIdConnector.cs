@@ -22,14 +22,14 @@ namespace JReact.Playfab_Interact.Login
         protected override IEnumerator<float> LoginImplementation(int currentAttempt = 0)
         {
             //setting the id
-            P_PlayfabConsoleLogger.DisplayMessage(string.Format("Playfab Connect Attempt {0} of {1}.\nDesire new account: {2}"
-                                                                , currentAttempt, _maxAttempts, _playerData.FirstTimePlay), name);
+            PConsole.Log($"Playfab Connect Attempt {currentAttempt} of {_maxAttempts}.\nDesire new account: {_playerData.FirstTimePlay}",
+                         name, this);
 
             //create the login request
             var request = SetupLoginRequest();
             if (_wantToDebug)
             {
-                P_PlayfabConsoleLogger.DisplayMessage(string.Format("Logging with custom id", P_Constants.DEBUG_PlayfabInteract), name);
+                PConsole.Log("Logging with custom id", name, this);
                 yield return Timing.WaitForSeconds(_debugDelay);
             }
 

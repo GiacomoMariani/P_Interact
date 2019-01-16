@@ -53,8 +53,7 @@ namespace JReact.Playfab_Interact.PlayerName
         private void SetName_OnSuccess(UpdateUserTitleDisplayNameResult result)
         {
             //send a feedback message
-            P_PlayfabConsoleLogger.DisplayMessage(string.Format("Player Display Name Change into: {0}",
-                                                                result.DisplayName), name);
+            PConsole.Log($"Player Display Name Change into: {result.DisplayName}", name, this);
             //confirm the name set
             CurrentValue = result.DisplayName;
             if (OnNameChange != null) OnNameChange(CurrentValue);
@@ -76,15 +75,15 @@ namespace JReact.Playfab_Interact.PlayerName
         private void SetName_OnError(PlayFabError error)
         {
             //send the message and the event
-            P_PlayfabConsoleLogger.LogErrorFrom(error, name);
+            PConsole.ErrorFrom(error, name);
             if (OnNameChangeError != null) OnNameChangeError(error.ErrorMessage);
         }
         #endregion
 
         #region SUBSCRIBERS
-        public void SubscribeToNameChange(JGenericDelegate<string> actionToAdd) { OnNameChange += actionToAdd; }
-        public void UnSubscribeToNameChange(JGenericDelegate<string> actionToRemove) { OnNameChange -= actionToRemove; }
-        public void SubscribeToNameChangeError(JGenericDelegate<string> actionToAdd) { OnNameChangeError += actionToAdd; }
+        public void SubscribeToNameChange(JGenericDelegate<string> actionToAdd) { OnNameChange                += actionToAdd; }
+        public void UnSubscribeToNameChange(JGenericDelegate<string> actionToRemove) { OnNameChange           -= actionToRemove; }
+        public void SubscribeToNameChangeError(JGenericDelegate<string> actionToAdd) { OnNameChangeError      += actionToAdd; }
         public void UnSubscribeToNameChangeError(JGenericDelegate<string> actionToRemove) { OnNameChangeError -= actionToRemove; }
         #endregion
     }

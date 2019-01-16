@@ -71,23 +71,18 @@ namespace JReact.Playfab_Interact.Data
             // 2 - Safe check, this should never happen
             if (saveableToLoad == null)
             {
-                HelperConsole.DisplayWarning(string.Format
-                                                 ("The saveable (key {0} - value {1}) returned from the load command is not in the list of {2}.\nAborting Load.",
-                                                  itemToLoad.Key, itemToLoad.Value, TaskName));
+                PConsole.Warning($"The saveable (key {itemToLoad.Key} - value {itemToLoad.Value}) returned from the load command is not in the list.\nAborting Load.",
+                                 TaskName);
                 return;
             }
 
             // 3 - make sure the item has not been loaded already
-            Assert.IsTrue(saveableToLoad.LoadRequested, string.Format
-                              ("The loader group {0} is trying to load {1}, that has not required to be loaded", TaskName,
-                               saveableToLoad.name));
+            Assert.IsTrue(saveableToLoad.LoadRequested,
+                          $"The loader group {TaskName} is trying to load {saveableToLoad.name}, that has not required to be loaded");
 
             //4 - send the retrieved data to the saveable
 
             //message log
-            HelperConsole.DisplayMessage(string.Format("{0} - <color=#FF0000>{1}</color>\n{2}", "Element_Load_Tag", itemToLoad.Key,
-                                                       itemToLoad.Value));
-
             saveableToLoad.LoadConfirmed(itemToLoad.Value, dateTime);
         }
 
@@ -102,8 +97,7 @@ namespace JReact.Playfab_Interact.Data
             {
                 if (saveable.LoadRequested)
                 {
-                    HelperConsole.DisplayWarning(string.Format("The item {0} has not been successfully load on {1}",
-                                                               saveable.name, TaskName));
+                    PConsole.Warning($"The item {saveable.name} has not been successfully load", TaskName);
                     saveable.LoadError();
                 }
             }

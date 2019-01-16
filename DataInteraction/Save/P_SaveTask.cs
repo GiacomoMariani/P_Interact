@@ -13,9 +13,9 @@ namespace JReact.Playfab_Interact.Data
         //the task name
         public override string TaskName { get { return "PlayfabSave_" + _taskId; } }
         //if we want these to be private or public
-        [BoxGroup("State", true, true, 5), ReadOnly, ShowInInspector] private bool _isPrivate = true;
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] private bool _isPrivate = true;
         //the dictionary of data
-        [BoxGroup("State", true, true, 5), ReadOnly, ShowInInspector]
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector]
         protected Dictionary<string, string> _dataContainer = new Dictionary<string, string>();
 
         #region SETUP - TASK
@@ -53,7 +53,7 @@ namespace JReact.Playfab_Interact.Data
             var jsonToSave = saveable.SaveThisIntoJson();
             //add this onto the dictionary
             Assert.IsFalse(_dataContainer.ContainsKey(keyValue),
-                           string.Format("We already have a key {0} on {1}. Coming from {2}", keyValue, TaskName, saveable.name));
+                           $"We already have a key {keyValue} on {TaskName}. Coming from {saveable.name}");
             _dataContainer.Add(keyValue, jsonToSave);
         }
 
@@ -82,16 +82,10 @@ namespace JReact.Playfab_Interact.Data
             // 1b - Safe check, this should never happen
             if (saveableToSend == null)
             {
-                HelperConsole.DisplayError(string.Format
-                                               ("The saveable (key {0} - value {1}) returned from the save command is not in the list of {2}.\nAborting Load.",
-                                                itemSaved.Key, itemSaved.Value, TaskName));
+                PConsole.Warning($"The saveable (key {itemSaved.Key} - value {itemSaved.Value}) returned from the save command is not in the list of {TaskName}.\nAborting Load.",
+                                 TaskName);
                 return;
             }
-
-
-            //message log
-            HelperConsole.DisplayMessage(string.Format("{0} - <color=#FF0000>{1}</color>\n{2}", "Element_Save_Tag",
-                                                       saveableToSend.GetDataIdentifier(), saveableToSend.SaveThisIntoJson()));
 
             //2 - send the retrieved data to the saveable
             saveableToSend.SaveConfirmed(itemSaved.Value);
@@ -103,8 +97,7 @@ namespace JReact.Playfab_Interact.Data
             foreach (var saveable in _taskData)
             {
                 if (!saveable.SaveRequested) continue;
-                HelperConsole.DisplayWarning(string.Format("The item {0} has not been successfully load on {1}",
-                                                           saveable.name, TaskName));
+                PConsole.Warning($"The item {saveable.name} has not been successfully load", TaskName);
                 saveable.SaveError();
             }
         }

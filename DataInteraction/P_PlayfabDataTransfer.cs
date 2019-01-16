@@ -28,7 +28,7 @@ namespace JReact.Playfab_Interact.Data
         private P_ConnectorSafeChecks _connectionChecks;
 
         //to start tracking the collection of rewards
-        [BoxGroup("State", true, true, 5), ReadOnly, ShowInInspector] private bool _isBusy = false;
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] private bool _isBusy = false;
         public bool IsBusy { get { return _isBusy; } private set { _isBusy = value; } }
 
         //a dictionary to store the current element
@@ -68,8 +68,7 @@ namespace JReact.Playfab_Interact.Data
             _savedData = dataToStore;
             //send the debug if requested
             if (_debugMode)
-                P_PlayfabConsoleLogger.DisplayMessage(string.Format("Sent Data to Playfab:\n{0}",
-                                                                    dataToStore.PrintAll()), name);
+                PConsole.Log($"Sent Data to Playfab:\n{dataToStore.PrintAll()}", name, this);
 
             // --------------- SEND THE COMMAND --------------- //
             //send the data to playfab
@@ -82,14 +81,14 @@ namespace JReact.Playfab_Interact.Data
         private void Save_OnSuccess(UpdateUserDataResult result)
         {
             IsBusy = false;
-            P_PlayfabConsoleLogger.DisplayMessage("Data has been saved.", name);
+            PConsole.Log("Data has been saved.", name);
             if (OnPlayfabDataSave != null) OnPlayfabDataSave(_savedData);
         }
 
         private void Save_OnError(PlayFabError error)
         {
             IsBusy = false;
-            P_PlayfabConsoleLogger.LogErrorFrom(error, name);
+            PConsole.ErrorFrom(error, name);
         }
         #endregion
 
@@ -103,8 +102,7 @@ namespace JReact.Playfab_Interact.Data
         {
             //requested the call
             if (_debugMode)
-                P_PlayfabConsoleLogger.DisplayMessage(string.Format("Load called.\nRequested: {0}",
-                                                                    desiredKeys.PrintAll()), name);
+                PConsole.Log($"Load called.\nRequested: {desiredKeys.PrintAll()}", name, this);
             // --------------- CHECKS --------------- //
             //stop if the transfer is not ready
             if (!TransferReady()) return false;
@@ -134,14 +132,14 @@ namespace JReact.Playfab_Interact.Data
                 _loadedTime[item.Key] = item.Value.LastUpdated;
             }
 
-            P_PlayfabConsoleLogger.DisplayMessage("Data has been loaded. " + result.Data.Keys.PrintAll(), name);
+            PConsole.Log($"Data has been loaded. {result.Data.Keys.PrintAll()}", name, this);
             if (OnPlayfabDataLoad != null) OnPlayfabDataLoad(_loadedData, _loadedTime);
         }
 
         private void Load_OnError(PlayFabError error)
         {
             IsBusy = false;
-            P_PlayfabConsoleLogger.LogErrorFrom(error, name);
+            PConsole.ErrorFrom(error, name);
         }
         #endregion
 
@@ -152,15 +150,15 @@ namespace JReact.Playfab_Interact.Data
             //1 - stop if we're not connected to playfab
             if (!_connectionChecks.PlayerLoggedIntoPlayfab)
             {
-                P_PlayfabConsoleLogger.DisplayWarning("We're trying to send data to playfab, but we're not connected.", name);
+                PConsole.Warning("We're trying to send data to playfab, but we're not connected.", name, this);
                 return false;
             }
 
             //2 - stop if we're busy
             if (IsBusy)
             {
-                P_PlayfabConsoleLogger.DisplayWarning
-                    ("Something requested to set multiple data when we were still sending. Aborting operation.", name);
+                PConsole.Warning("Something requested to set multiple data when we were still sending. Aborting operation.", name,
+                                 this);
                 return false;
             }
 
@@ -171,7 +169,7 @@ namespace JReact.Playfab_Interact.Data
 
         #region SUBRSCRIBE
         //subscribe and unsubscribe to the load event
-        public void SubscribeToSave(PlayfabDataSaveEvent actionToSend) { OnPlayfabDataSave += actionToSend; }
+        public void SubscribeToSave(PlayfabDataSaveEvent actionToSend) { OnPlayfabDataSave   += actionToSend; }
         public void UnSubscribeToSave(PlayfabDataSaveEvent actionToSend) { OnPlayfabDataSave -= actionToSend; }
 
         //subscribe and unsubscribe to the load event

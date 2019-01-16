@@ -20,17 +20,18 @@ namespace JReact.Playfab_Interact.Data
 
         #region FIELDS AND PROPERTIS
         //the list of elements to be saved, we can have different groups by instantiating different scriptable objects
-        [BoxGroup("State", true, true, 5), ReadOnly, ShowInInspector]
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector]
         protected P_Saveable[] _taskData = new P_Saveable[P_Constants.MaxRequestAmount];
 
         //the transfer control that will send the data to playfab
-        [BoxGroup("State", true, true, 5), ReadOnly, ShowInInspector]
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector]
         protected P_PlayfabDataTransfer _dataTransfer;
-        [BoxGroup("State", true, true, 5), ShowInInspector, ReadOnly] public int CurrentData { get { return _taskData.Length; } }
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] public int CurrentData { get { return _taskData.Length; } }
         #endregion
 
         #region CONSTRUCTOR AND SETUP
         protected P_SaveableTask() { IsRunning = false; }
+
         public void InjectData(P_PlayfabDataTransfer dataTransfer, int taskId)
         {
             _dataTransfer = dataTransfer;
@@ -50,13 +51,13 @@ namespace JReact.Playfab_Interact.Data
         {
             //make sure we do not have too many elements
             Assert.IsTrue(_taskData.Length <= P_Constants.MaxRequestAmount,
-                          string.Format("{0} has {1} elements. Max is {2}", TaskName, _taskData.Length,
-                                        P_Constants.MaxRequestAmount));
+                          $"{TaskName} has {_taskData.Length} elements. Max is {P_Constants.MaxRequestAmount}");
         }
         #endregion
 
         #region TASK COMMANDS
         protected abstract void SendGroup();
+
         protected void CompleteTask()
         {
             //send the complete event and reset

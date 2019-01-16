@@ -67,7 +67,7 @@ namespace JReact.Playfab_Interact
             //make sure we do not start while we are already going
             if (IsTracking)
             {
-                P_PlayfabConsoleLogger.DisplayWarning("Checking already. Abort to avoid checking multiple times.", name);
+                PConsole.Warning("Checking already. Abort to avoid checking multiple times.", name, this);
                 return;
             }
 
@@ -85,7 +85,7 @@ namespace JReact.Playfab_Interact
             //ignore if we are not checking
             if (!IsTracking)
             {
-                P_PlayfabConsoleLogger.DisplayWarning("This is not checking.", name);
+                PConsole.Warning("This is not checking.", name, this);
                 return;
             }
 
@@ -120,7 +120,7 @@ namespace JReact.Playfab_Interact
         {
             if (InternetReady) return true;
             if (OnMissingInternet != null) OnMissingInternet();
-            P_PlayfabConsoleLogger.DisplayWarning("No Internet.", name);
+            PConsole.Warning("No Internet.", name, this);
             return false;
         }
 
@@ -134,8 +134,8 @@ namespace JReact.Playfab_Interact
         #endregion
 
         #region SUBSCRIBERS
-        public void SubscribeToMissingInternet(JAction actionToSend) { OnMissingInternet   += actionToSend; }
-        public void UnSubscribeToMissingInternet(JAction actionToSend) { OnMissingInternet -= actionToSend; }
+        public void SubscribeToMissingInternet(JAction actionToSend) { OnMissingInternet      += actionToSend; }
+        public void UnSubscribeToMissingInternet(JAction actionToSend) { OnMissingInternet    -= actionToSend; }
         public void SubscribeToMissingPlayfab(JAction actionToSend) { OnMissingPlayfabLogin   += actionToSend; }
         public void UnSubscribeToMissingPlayfab(JAction actionToSend) { OnMissingPlayfabLogin -= actionToSend; }
         #endregion
@@ -143,7 +143,7 @@ namespace JReact.Playfab_Interact
         #region DISABLE AND RESET
         //we reset this on disable
         protected virtual void OnDisable() { ResetThis(); }
-        private void ResetThis() { StopTracking();}
+        private void ResetThis() { StopTracking(); }
         #endregion
     }
 }
