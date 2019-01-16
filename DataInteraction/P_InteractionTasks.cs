@@ -30,14 +30,14 @@ namespace JReact.Playfab_Interact.Data
         private P_PlayfabDataTransfer _dataTransfer;
 
         //initialization
-        [BoxGroup("State", true, true, 5), ShowInInspector, ReadOnly] private bool _initialized = false;
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] private bool _initialized = false;
         //the queue of saving
-        [BoxGroup("State", true, true, 5), ShowInInspector, ReadOnly]
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector]
         protected Queue<P_Saveable> _saveableInQueue = new Queue<P_Saveable>();
         //the current tasks
-        [BoxGroup("State", true, true, 5), ShowInInspector, ReadOnly] private T[] _tasks;
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] private T[] _tasks;
         //the current task
-        [BoxGroup("State", true, true, 5), ShowInInspector, ReadOnly] protected T _CurrentTask
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] protected T _CurrentTask
         {
             get
             {
@@ -48,7 +48,7 @@ namespace JReact.Playfab_Interact.Data
             }
         }
         //current task
-        [BoxGroup("State", true, true, 5), ShowInInspector, ReadOnly] private int _nextTask = 0;
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] private int _nextTask = 0;
         public int NextTask { get => _nextTask; protected set => _nextTask = value % _allocatedTask; }
         #endregion
 

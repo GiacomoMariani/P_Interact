@@ -14,8 +14,8 @@ namespace JReact.Playfab_Interact.Data
         public override string TaskName { get { return "PlayfabLoad_" + _taskId; } }
 
         //the list of elements we want to load
-        [BoxGroup("State", true, true, 5), ShowInInspector, ReadOnly] private List<string> _desiredKeys = new List<string>();
-        [BoxGroup("State", true, true, 5), ShowInInspector, ReadOnly] private string _playfabIdToLoad = "";
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] private List<string> _desiredKeys = new List<string>();
+        [FoldoutGroup("State", false, 5), ReadOnly, ShowInInspector] private string _playfabIdToLoad = "";
 
 
         #region LOAD PROCESSING - TASK IMPLEMENTATION
